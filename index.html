@@ -3,266 +3,248 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Composer: Function Composition Calculator</title>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Railwise: Search Indian Trains, Fares and Routes</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#EEF2F6;--panel:#fff;--ink:#101B33;--mut:#566175;--line:#D3DBE5;--f:#2B50E6;--g:#C2185B;--fg:#0F8B6D;--gf:#A86A0C;--acc:#2B50E6;--on:#fff;--grid:rgba(43,80,230,.07)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1424;--panel:#151E33;--ink:#E8EDF7;--mut:#9AA5BA;--line:#28344F;--f:#7C99FF;--g:#FF7AA8;--fg:#3FD1A8;--gf:#F0B84A;--acc:#7C99FF;--on:#0D1424;--grid:rgba(124,153,255,.08)}}
-:root[data-theme="dark"]{--bg:#0D1424;--panel:#151E33;--ink:#E8EDF7;--mut:#9AA5BA;--line:#28344F;--f:#7C99FF;--g:#FF7AA8;--fg:#3FD1A8;--gf:#F0B84A;--acc:#7C99FF;--on:#0D1424;--grid:rgba(124,153,255,.08)}
+--bg:#EFF3F9;--card:#fff;--ink:#14213D;--mut:#5C6B85;--line:#DCE3EE;--pri:#1D3F8F;--pri2:#2A57C4;--acc:#E8731A;--ok:#0E8A5F;--on:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C1322;--card:#141D33;--ink:#E7ECF6;--mut:#9AA7C0;--line:#26324F;--pri:#6F94F5;--pri2:#8CAAF8;--acc:#F59A4A;--ok:#3DD3A0;--on:#0C1322}}
+:root[data-theme="dark"]{--bg:#0C1322;--card:#141D33;--ink:#E7ECF6;--mut:#9AA7C0;--line:#26324F;--pri:#6F94F5;--pri2:#8CAAF8;--acc:#F59A4A;--ok:#3DD3A0;--on:#0C1322}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;
-background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
-h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;line-height:1.15;margin:0 0 .5em}
-h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.02em}
-h2{font-size:1.5rem;font-weight:600}h3{font-size:1.1rem;font-weight:600}
-p{margin:0 0 1em;max-width:68ch}
-a{color:var(--acc)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Plus Jakarta Sans",system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-header{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
-.bar{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:20px}
-.logo{font:800 1.35rem "Bricolage Grotesque",sans-serif;color:var(--ink);text-decoration:none;white-space:nowrap}
-.logo span{color:var(--acc)}
-nav{display:flex;gap:4px;overflow-x:auto;flex:1}
-nav a{padding:8px 12px;border-radius:8px;color:var(--mut);text-decoration:none;font-weight:500;white-space:nowrap}
-nav a:hover{background:var(--bg);color:var(--ink)}
-nav a[aria-current="page"]{background:var(--ink);color:var(--bg)}
-main{max-width:1080px;margin:0 auto;padding:32px 20px 64px}
-.lead{color:var(--mut);font-size:1.1rem}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px}
-.fbar{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:end}
-.fbar .row2{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px;align-items:end}
-label{display:block;font-weight:600;font-size:.9rem;color:var(--mut)}
-input{width:100%;margin-top:4px;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:500 1.05rem "IBM Plex Mono",monospace}
-input:focus{border-color:var(--acc)}
-#fi{border-left:5px solid var(--f)}#gi{border-left:5px solid var(--g)}
-button{font:600 .95rem "IBM Plex Sans",sans-serif;padding:10px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
-button:hover{border-color:var(--acc)}button:active{transform:translateY(1px)}
-button.pri{background:var(--acc);color:var(--on);border-color:var(--acc)}
-.keys{display:flex;flex-wrap:wrap;gap:6px;grid-column:1/-1}
-.keys button{padding:6px 11px;font:500 .9rem "IBM Plex Mono",monospace}
-.err{grid-column:1/-1;color:var(--g);font-weight:500;min-height:1.4em}
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.big{font:500 1.15rem/1.5 "IBM Plex Mono",monospace;overflow-x:auto;padding:12px;background:var(--bg);border-radius:8px;border-left:5px solid var(--fg)}
-.big.alt{border-left-color:var(--gf)}
-ol.steps{padding-left:1.2em;margin:0}ol.steps li{margin-bottom:.7em}
-code,.mono{font-family:"IBM Plex Mono",monospace;font-size:.95em}
-.note{color:var(--mut);font-size:.92rem}
-.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:.8rem;font-weight:600;background:var(--bg);border:1px solid var(--line)}
-.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.chk{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px}
-.chk label{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
-.chk input{width:auto;margin:0}
-canvas{width:100%;height:clamp(300px,55vw,520px);display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;touch-action:none}
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
-table{border-collapse:collapse;width:100%;font:.95rem "IBM Plex Mono",monospace}
-th,td{padding:8px 14px;text-align:right;border-bottom:1px solid var(--line)}
-th{background:var(--bg);font-family:"IBM Plex Sans",sans-serif}
-.ex{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-.ex .panel{margin:0;display:flex;flex-direction:column;gap:6px}.ex .mono{display:block}.ex button{margin-top:auto;align-self:flex-start}
-details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:10px}
-summary{cursor:pointer;font-weight:600}
-.tbl2 td,.tbl2 th{text-align:left}
-footer{max-width:1080px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-size:.9rem}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--card);border-bottom:1px solid var(--line)}
+.w{max-width:1040px;margin:0 auto;padding:0 18px}
+.top{display:flex;align-items:center;gap:18px;height:60px}
+.logo{font-weight:800;font-size:1.3rem;letter-spacing:-.02em;color:var(--pri);display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo i{width:30px;height:30px;border-radius:8px;background:var(--pri);display:grid;place-items:center;color:var(--on);font-style:normal;font-size:.95rem}
+nav{display:flex;gap:4px;flex:1}
+nav button{border:0;background:none;padding:8px 14px;border-radius:99px;font-weight:600;color:var(--mut);cursor:pointer}
+nav button[aria-pressed="true"]{background:var(--pri);color:var(--on)}
+.hero{background:linear-gradient(180deg,var(--pri) 0,var(--pri) 62%,var(--bg) 62%);padding:34px 0 0;color:#fff}
+:root[data-theme="dark"] .hero,:root:not([data-theme="light"]) .hero{--hc:#fff}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:800;letter-spacing:-.025em;line-height:1.15;margin:0 0 6px;color:#fff}
+.hero p{margin:0 0 22px;opacity:.9;color:#fff}
+.sb{background:var(--card);color:var(--ink);border-radius:16px;padding:18px;box-shadow:0 12px 32px rgba(10,25,60,.18);display:grid;grid-template-columns:1fr 44px 1fr 170px 150px auto;gap:10px;align-items:end}
+.f label{display:block;font-size:.78rem;font-weight:700;color:var(--mut);margin-bottom:4px}
+.f input,.f select{width:100%;height:48px;padding:0 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);font-weight:600}
+.f input:focus,.f select:focus{border-color:var(--pri)}
+.swap{height:48px;border-radius:50%;width:44px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-size:1.1rem}
+.swap:hover{border-color:var(--pri)}
+.go{height:48px;padding:0 24px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-weight:800;cursor:pointer}
+.go:hover{filter:brightness(1.07)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.chip{padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:.88rem;font-weight:600}
+.chip:hover{border-color:var(--pri);color:var(--pri)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:18px 0 12px}
+.bar h2{margin:0;font-size:1.15rem}
+.bar select{height:38px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--card)}
+.t{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;position:relative}
+.t:before,.t:after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1px solid var(--line);top:50%;margin-top:-9px}
+.t:before{left:-10px;clip-path:inset(0 0 0 50%)}.t:after{right:-10px;clip-path:inset(0 50% 0 0)}
+.th{padding:16px 20px 8px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.th b{font-size:1.08rem}.no{color:var(--mut);font-weight:600}
+.tag{font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--bg);border:1px solid var(--line)}
+.tag.r{background:#FDEBD9;color:#9A4A0A;border-color:#F5CFA8}.tag.v{background:#DDF4EA;color:#0A6A48;border-color:#B2E5CF}
+:root[data-theme="dark"] .tag.r{background:#3B2A18;color:#F7B779;border-color:#5A3F22}:root[data-theme="dark"] .tag.v{background:#143A2D;color:#6DE0B4;border-color:#235A47}
+.run{margin-left:auto;font-size:.82rem;color:var(--mut)}
+.tm{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:6px 20px 14px}
+.tm .c b{font-size:1.5rem;display:block;line-height:1.1;font-variant-numeric:tabular-nums}
+.tm .c span{font-size:.84rem;color:var(--mut)}.tm .c.e{text-align:right}
+.ln{text-align:center;font-size:.82rem;color:var(--mut)}
+.ln div{height:2px;background:var(--line);position:relative;margin:6px 0}
+.ln div:before,.ln div:after{content:"";position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--pri)}
+.ln div:before{left:0}.ln div:after{right:0;background:var(--acc)}
+.fares{display:flex;flex-wrap:wrap;gap:10px;padding:14px 20px;border-top:2px dashed var(--line)}
+.fc{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 14px;cursor:pointer;text-align:left;min-width:128px}
+.fc:hover{border-color:var(--pri);background:var(--card)}
+.fc small{display:block;color:var(--mut);font-weight:600;font-size:.76rem}.fc b{font-size:1.1rem}
+.fc.sel{border-color:var(--ok)}
+.rt{margin-left:auto;align-self:center;border:0;background:none;color:var(--pri);font-weight:700;cursor:pointer}
+.route{padding:4px 20px 18px;border-top:1px solid var(--line)}
+.route ol{list-style:none;margin:12px 0 0;padding:0 0 0 22px;border-left:3px solid var(--line)}
+.route li{position:relative;padding:3px 0 10px 14px}
+.route li:before{content:"";position:absolute;left:-30px;top:8px;width:11px;height:11px;border-radius:50%;background:var(--card);border:3px solid var(--pri)}
+.route li:first-child:before,.route li:last-child:before{background:var(--acc);border-color:var(--acc)}
+.route em{font-style:normal;color:var(--mut);font-size:.85rem;margin-left:6px}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:12px 16px;font-size:.88rem;color:var(--mut);margin:18px 0}
+.empty{text-align:center;padding:40px 16px;background:var(--card);border:1px dashed var(--line);border-radius:14px}
+dialog{border:0;border-radius:16px;padding:0;width:min(520px,94vw);background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(8,16,36,.6)}
+.dm{padding:22px}.dm h3{margin:0 0 4px;font-size:1.25rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.dm .f{margin-bottom:8px}.row{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+.sec{border:1.5px solid var(--line);background:var(--card);padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer}
+.tk{border:2px dashed var(--ok);border-radius:12px;padding:16px;margin-top:12px}
+.tk .pnr{font-size:1.5rem;font-weight:800;letter-spacing:.06em;color:var(--ok)}
+.bk{padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+.bk .pnr{font-weight:800;color:var(--ok)}
+footer{padding:32px 0 48px;color:var(--mut);font-size:.88rem}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
 #toast.on{opacity:1}
+.wb{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end;background:var(--card);padding:18px;border-radius:14px;border:1px solid var(--line);margin-bottom:16px}
+.pb{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:10px 0}.pb i{display:block;height:100%;background:var(--ok)}
+.lk{display:inline-block;margin:6px 14px 0 0;color:var(--pri);font-weight:700}
 [hidden]{display:none!important}
-@media (max-width:760px){.fbar,.cols{grid-template-columns:1fr}.bar{flex-wrap:wrap;gap:8px}}
+@media (max-width:700px){.wb{grid-template-columns:1fr}}
+@media (max-width:900px){.sb{grid-template-columns:1fr 1fr}.sb .swap{display:none}.go{grid-column:1/-1}}
+@media (max-width:560px){.sb{grid-template-columns:1fr}.tm{gap:8px}.tm .c b{font-size:1.2rem}.run{margin-left:0;width:100%}.g2{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header><div class="bar">
-<a class="logo" href="#/">f<span>∘</span>g Composer</a>
-<nav aria-label="Main">
-<a href="#/" data-p="calc">Calculator</a><a href="#/graph" data-p="graph">Graph</a><a href="#/table" data-p="table">Table</a><a href="#/learn" data-p="learn">Learn</a><a href="#/examples" data-p="examples">Examples</a><a href="#/help" data-p="help">Help</a>
-</nav>
-<button id="theme" aria-label="Switch light or dark theme">Theme</button>
+<header><div class="w top">
+<a class="logo" href="#" aria-label="Railwise home"><i>R</i>Railwise</a>
+<nav aria-label="Main"><button data-v="s" aria-pressed="true">Search trains</button><button data-v="w" aria-pressed="false">Where is my train</button><button data-v="b" aria-pressed="false">My bookings</button><button data-v="a" aria-pressed="false">About</button></nav>
+<button class="sec" id="theme" aria-label="Toggle light or dark theme">Theme</button>
 </div></header>
-<main>
-<section id="fbarwrap" class="panel">
-<div class="fbar">
-<label>f(x) =<input id="fi" spellcheck="false" autocomplete="off" aria-label="f of x"></label>
-<button id="swap" title="Swap f and g">Swap f and g</button>
-<label>g(x) =<input id="gi" spellcheck="false" autocomplete="off" aria-label="g of x"></label>
-<div class="row2"><label style="width:150px">Evaluate at x =<input id="xi" spellcheck="false" autocomplete="off"></label>
-<button id="clear">Clear all</button></div>
-<div class="keys" id="keys" aria-label="Insert symbols"></div>
-<div class="err" id="ferr" role="alert"></div>
+
+<div id="vs">
+<section class="hero"><div class="w">
+<h1>Find a train between any two stations.</h1>
+<p>Timings, distance, halts and fares for popular Indian Railways services.</p>
+<form class="sb" id="sf">
+<div class="f"><label for="fr">From</label><input id="fr" list="stl" value="Mumbai" autocomplete="off"></div>
+<button type="button" class="swap" id="sw" aria-label="Swap from and to">⇄</button>
+<div class="f"><label for="to">To</label><input id="to" list="stl" value="Delhi" autocomplete="off"></div>
+<div class="f"><label for="dt">Journey date</label><input type="date" id="dt"></div>
+<div class="f"><label for="cl">Class</label><select id="cl"><option value="">All classes</option><option value="1A">First AC (1A)</option><option value="2A">Second AC (2A)</option><option value="3A">Third AC (3A)</option><option value="EC">Executive Chair (EC)</option><option value="CC">AC Chair Car (CC)</option><option value="2S">Second Sitting (2S)</option></select></div>
+<button class="go" type="submit">Search trains</button>
+</form>
+<datalist id="stl"></datalist>
+</div></section>
+<div class="w">
+<div class="chips" id="pop" aria-label="Popular routes"></div>
+<div id="res"></div>
 </div>
-</section>
+</div>
 
-<section id="p-calc">
-<h1>Compose two functions and see every step.</h1>
-<p class="lead">Type f(x) and g(x) above. Composer builds f(g(x)) and g(f(x)), evaluates both, and checks where each is defined.</p>
-<div id="calcout"></div>
-</section>
+<div id="vw" class="w" hidden><div class="bar"><h2>Where is my train</h2></div>
+<div class="note" style="margin-top:0"><b>Not live.</b> This shows where a train should be right now if it runs exactly on time, using its timetable and your device clock. For real running status, use the links below the result.</div>
+<div class="wb"><div class="f"><label for="wt">Train</label><select id="wt"></select></div><div class="f"><label for="wd">Date it left the first station</label><input type="date" id="wd"></div><button class="go" id="wg">Check position</button></div>
+<div id="wo"></div></div>
+<div id="vb" class="w" hidden><div class="bar"><h2>My bookings</h2></div><div id="bl"></div></div>
 
-<section id="p-graph" hidden>
-<h1>Graph</h1>
-<div class="chk" id="chk"></div>
-<canvas id="cv" aria-label="Graph of the functions"></canvas>
-<p class="note" id="readout">Move over the graph to read values.</p>
-<div class="tools"><button id="zi">Zoom in</button><button id="zo">Zoom out</button><button id="zr">Reset view</button></div>
-</section>
-
-<section id="p-table" hidden>
-<h1>Table of values</h1>
-<div class="panel"><div class="row2" style="display:flex;gap:12px;flex-wrap:wrap">
-<label style="width:110px">From<input id="t0" value="-5"></label><label style="width:110px">To<input id="t1" value="5"></label><label style="width:110px">Step<input id="ts" value="1"></label>
-<button class="pri" id="tcopy" style="align-self:end">Copy as CSV</button></div></div>
-<div class="tw"><table id="tbl"></table></div>
-</section>
-
-<section id="p-learn" hidden>
-<h1>How function composition works</h1>
-<p class="lead">Composition feeds the output of one function into another. Written (f∘g)(x) = f(g(x)), it means: apply g first, then f.</p>
-<h2>A worked example</h2>
-<p>Let f(x) = x² + 1 and g(x) = 2x − 3. To find f(g(x)), replace every x in f with g(x): (2x − 3)² + 1. To find g(f(x)), do the reverse: 2(x² + 1) − 3 = 2x² − 1. The two answers differ, so order matters.</p>
-<h2>Domain</h2>
-<p>f(g(x)) exists only when g(x) is defined and its output is allowed by f. If f(x) = √x and g(x) = x − 4, then f(g(x)) needs x − 4 ≥ 0, so x ≥ 4. The graph page shows gaps where a composite is undefined.</p>
-<h2>Inverse functions</h2>
-<p>If f and g undo each other, both f(g(x)) and g(f(x)) simplify to x. Try f(x) = 2x + 3 with g(x) = (x − 3)/2 on the Examples page.</p>
-<h2>Decomposing a function</h2>
-<p>To split h(x) = (3x + 1)⁴ into two functions, name the inside g(x) = 3x + 1 and the outside f(x) = x⁴. Then h = f∘g. This is the first step of the chain rule in calculus.</p>
-<p><a href="#/examples">Try an example</a></p>
-</section>
-
-<section id="p-examples" hidden>
-<h1>Examples</h1>
-<p class="lead">Pick one to load it into the calculator.</p>
-<div class="ex" id="exgrid"></div>
-</section>
-
-<section id="p-help" hidden>
-<h1>Help</h1>
-<h2>Syntax</h2>
-<div class="tw" style="margin-bottom:24px"><table class="tbl2"><tr><th>To write</th><th>Type</th></tr>
-<tr><td>Powers</td><td class="mono">x^2, 2^x</td></tr><tr><td>Multiply</td><td class="mono">2*x or 2x or 3(x+1)</td></tr>
-<tr><td>Roots and absolute value</td><td class="mono">sqrt(x), cbrt(x), abs(x)</td></tr>
-<tr><td>Trig (radians)</td><td class="mono">sin(x), cos(x), tan(x), asin, acos, atan</td></tr>
-<tr><td>Logs and exponentials</td><td class="mono">ln(x), log(x) for base 10, exp(x)</td></tr>
-<tr><td>Constants</td><td class="mono">pi, e</td></tr></table></div>
-<h2>Questions</h2>
-<details><summary>Why does the result say undefined?</summary><p>The input broke a rule of a function, such as dividing by zero, taking the square root of a negative number, or taking the log of zero or less.</p></details>
-<details><summary>Does Composer simplify the result?</summary><p>No. It shows the substituted form exactly, so you can see each step. The table and graph confirm the values numerically.</p></details>
-<details><summary>Are my functions saved?</summary><p>Yes, in this browser only, so they are still here when you return.</p></details>
-<details><summary>Can I use degrees?</summary><p>Trig functions use radians. For degrees, write sin(x*pi/180).</p></details>
-</section>
-</main>
-<footer>Composer runs entirely in your browser. Nothing you type is sent anywhere.</footer>
+<div id="va" class="w" hidden>
+<div class="bar"><h2>About Railwise</h2></div>
+<div class="note" style="margin-top:0"><b>This is a demo.</b> Tickets made here are for practice only and cannot be used to travel. To book a real ticket, use IRCTC.</div>
+<p>Timetables marked <b>Verified timetable</b> (12951 and 12952) list every halt with arrival and departure times and distance, taken from published schedules. <b>Partly verified</b> means only some stops are confirmed. <b>Times unverified</b> trains come from my own knowledge and may be wrong. Fares are rough, unverified amounts for an adult, and sources disagree on them, so check IRCTC before booking. Timetables change, so confirm on NTES or IRCTC before you travel.</p>
+<p>Railwise lists 12 well-known services across 7 routes. Seat availability is not shown because it needs a live railway feed.</p>
+</div>
+<div class="w"><footer>Railwise is a demo project and is not affiliated with Indian Railways or IRCTC.</footer></div>
+<dialog id="dlg"></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
+
 <script>
 const $=id=>document.getElementById(id);
-const FN={sin:Math.sin,cos:Math.cos,tan:Math.tan,asin:Math.asin,acos:Math.acos,atan:Math.atan,sinh:Math.sinh,cosh:Math.cosh,tanh:Math.tanh,sqrt:Math.sqrt,cbrt:Math.cbrt,abs:Math.abs,ln:Math.log,log:Math.log10,exp:Math.exp,floor:Math.floor,ceil:Math.ceil,round:Math.round,sign:Math.sign};
-const CO={pi:Math.PI,e:Math.E};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmt=n=>(typeof n!=='number'||isNaN(n))?'undefined':String(+n.toPrecision(10));
-function lex(s){const t=[];let i=0;s=s.replace(/π/g,'pi').replace(/[×·]/g,'*').replace(/−/g,'-');
-while(i<s.length){const ch=s[i];if(/\s/.test(ch)){i++;continue}let m,r=s.slice(i);
-if(m=/^(\d+\.?\d*|\.\d+)/.exec(r)){t.push({k:'n',v:m[0]});i+=m[0].length}
-else if(m=/^[a-z]+/i.exec(r)){t.push({k:'i',v:m[0].toLowerCase()});i+=m[0].length}
-else if('+-*/^'.includes(ch)){t.push({k:'o',v:ch});i++}
-else if(ch=='('||ch==')'){t.push({k:ch,v:ch});i++}
-else throw Error('Unexpected character "'+ch+'"')}return t}
-function parse(t){let p=0;const pk=()=>t[p],nx=()=>t[p++];
-function E(){let l=T();while(pk()&&pk().k=='o'&&'+-'.includes(pk().v)){const o=nx().v;l={o,l,r:T()}}return l}
-function T(){let l=U();for(;;){const k=pk();if(!k)break;if(k.k=='o'&&'*/'.includes(k.v)){nx();l={o:k.v,l,r:U()}}else if(k.k=='n'||k.k=='i'||k.k=='('){l={o:'*',l,r:U()}}else break}return l}
-function U(){const k=pk();if(k&&k.k=='o'&&(k.v=='-'||k.v=='+')){nx();const a=U();return k.v=='-'?{o:'neg',l:a}:a}return P()}
-function P(){const b=A();if(pk()&&pk().k=='o'&&pk().v=='^'){nx();return{o:'^',l:b,r:U()}}return b}
-function close(){if(!pk()||pk().k!=')')throw Error('Missing closing parenthesis');nx()}
-function A(){const k=nx();if(!k)throw Error('The expression ends too early');
-if(k.k=='n')return{n:+k.v};
-if(k.k=='('){const e=E();close();return e}
-if(k.k=='i'){if(k.v=='x')return{x:1};if(k.v in CO)return{n:CO[k.v]};
-if(k.v in FN){if(!pk()||pk().k!='(')throw Error(k.v+' needs parentheses, like '+k.v+'(x)');nx();const e=E();close();return{f:FN[k.v],a:e}}
-throw Error('Unknown name "'+k.v+'"')}
-throw Error('Unexpected "'+k.v+'"')}
-const r=E();if(p<t.length)throw Error('Unexpected "'+t[p].v+'"');return r}
-function ev(a,x){if(a.n!==undefined)return a.n;if(a.x)return x;if(a.f)return a.f(ev(a.a,x));const l=ev(a.l,x);if(a.o=='neg')return -l;const r=ev(a.r,x);
-switch(a.o){case'+':return l+r;case'-':return l-r;case'*':return l*r;case'/':return l/r;case'^':return Math.pow(l,r)}}
-function compile(src,name){try{src=(src||'').trim();if(!src)throw Error('Enter a function');const t=lex(src),ast=parse(t);
-return{src,t,fn:x=>{const v=ev(ast,x);return isFinite(v)?v:NaN}}}catch(e){throw Error(name+': '+e.message)}}
-function join(t){let s='';t.forEach((k,i)=>{const pv=t[i-1];if(k.k=='o'){const bin=pv&&['n','i',')','r'].includes(pv.k);s+=(bin&&k.v!='^')?' '+k.v+' ':k.v}else s+=k.v});return s}
-function sub(ft,gt){const gs=join(gt);return join(ft.map((k,i)=>{if(k.k=='i'&&k.v=='x'){const wrapped=ft[i-1]&&ft[i-1].k=='('&&ft[i+1]&&ft[i+1].k==')';return{k:'r',v:(gt.length==1||wrapped)?gs:'('+gs+')'}}return k}))}
-function holes(fn){const out=[];let s=null;const a=-50,b=50,n=4000;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,bad=isNaN(fn(x));if(bad&&s===null)s=x;if(!bad&&s!==null){out.push([s,x-(b-a)/n]);s=null}}if(s!==null)out.push([s,b]);return out}
-function holeText(h){if(!h.length)return 'No undefined values found for x between -50 and 50.';
-return 'Undefined near '+h.slice(0,3).map(r=>Math.abs(r[1]-r[0])<.05?'x ≈ '+fmt(+r[0].toFixed(2)):'x from '+fmt(+r[0].toFixed(2))+' to '+fmt(+r[1].toFixed(2))).join(', ')+(h.length>3?' and more':'')+'.'}
+const ST={BCT:['Mumbai Central','Mumbai'],NDLS:['New Delhi','Delhi'],NZM:['Hazrat Nizamuddin','Delhi'],HWH:['Howrah Jn','Kolkata'],BSB:['Varanasi Jn','Varanasi'],CSMT:['Chhatrapati Shivaji Maharaj Terminus','Mumbai'],PUNE:['Pune Jn','Pune'],ADI:['Ahmedabad Jn','Ahmedabad'],BPL:['Bhopal Jn','Bhopal'],AGC:['Agra Cantt','Agra']};
+const CL={'1A':'First AC','2A':'Second AC','3A':'Third AC','CC':'AC Chair Car','EC':'Executive Chair','2S':'Second Sitting'};
+// no, name, type, from, to, dep, arr, dayOffset, km, fares, halts
+const T=[
+['12951','Mumbai Rajdhani Express','Rajdhani','BCT','NDLS','17:00','08:32',1,1384,{'1A':7200,'2A':4300,'3A':3150},'Mumbai Central|Borivali|Surat|Vadodara Jn|Ratlam Jn|Kota Jn|New Delhi'],
+['12952','Mumbai Rajdhani Express','Rajdhani','NDLS','BCT','16:55','08:35',1,1384,{'1A':7200,'2A':4300,'3A':3150},'New Delhi|Kota Jn|Ratlam Jn|Vadodara Jn|Surat|Borivali|Mumbai Central'],
+['12301','Howrah Rajdhani Express','Rajdhani','HWH','NDLS','16:50','10:05',1,1449,{'1A':6800,'2A':3950,'3A':2950},'Howrah Jn|Dhanbad Jn|Gaya Jn|Pt DD Upadhyaya Jn|Kanpur Central|New Delhi'],
+['12302','Howrah Rajdhani Express','Rajdhani','NDLS','HWH','16:50','09:55',1,1449,{'1A':6800,'2A':3950,'3A':2950},'New Delhi|Kanpur Central|Pt DD Upadhyaya Jn|Gaya Jn|Dhanbad Jn|Howrah Jn'],
+['22435','Vande Bharat Express','Vande Bharat','NDLS','BSB','06:00','14:00',0,759,{'CC':1750,'EC':3300},'New Delhi|Kanpur Central|Prayagraj Jn|Varanasi Jn'],
+['22436','Vande Bharat Express','Vande Bharat','BSB','NDLS','15:00','23:00',0,759,{'CC':1750,'EC':3300},'Varanasi Jn|Prayagraj Jn|Kanpur Central|New Delhi'],
+['12123','Deccan Queen','Superfast','CSMT','PUNE','17:10','20:25',0,192,{'2S':145,'CC':400,'EC':780},'Mumbai CSMT|Dadar|Thane|Kalyan Jn|Karjat|Lonavala|Pune Jn'],
+['12124','Deccan Queen','Superfast','PUNE','CSMT','07:15','10:25',0,192,{'2S':145,'CC':400,'EC':780},'Pune Jn|Lonavala|Karjat|Kalyan Jn|Thane|Dadar|Mumbai CSMT'],
+['12009','Mumbai–Ahmedabad Shatabdi','Shatabdi','BCT','ADI','06:25','12:55',0,491,{'CC':1050,'EC':2100},'Mumbai Central|Borivali|Surat|Vadodara Jn|Anand Jn|Ahmedabad Jn'],
+['12002','Bhopal Shatabdi','Shatabdi','NDLS','BPL','06:00','14:25',0,705,{'CC':1500,'EC':2950},'New Delhi|Mathura Jn|Agra Cantt|Gwalior|Jhansi Jn|Bhopal Jn'],
+['12050','Gatimaan Express','Superfast','NZM','AGC','08:10','09:50',0,188,{'CC':780,'EC':1550},'Hazrat Nizamuddin|Agra Cantt'],
+['12049','Gatimaan Express','Superfast','AGC','NZM','17:50','19:30',0,188,{'CC':780,'EC':1550},'Agra Cantt|Hazrat Nizamuddin']
+].map(r=>({no:r[0],name:r[1],type:r[2],from:r[3],to:r[4],dep:r[5],arr:r[6],off:r[7],km:r[8],fare:r[9],halts:r[10].split('|')}));
 
-let S={f:'x^2+1',g:'2x-3',x:'2',range:8,show:{f:1,g:1,fg:1,gf:0}},M=null,hx=null;
-try{Object.assign(S,JSON.parse(localStorage.getItem('composer')||'{}'))}catch(e){}
-const save=()=>{try{localStorage.setItem('composer',JSON.stringify(S))}catch(e){}};
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1600)}
-function copy(txt){try{navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy blocked by the browser'))}catch(e){toast('Copy blocked by the browser')}}
+const V={
+'12951':{v:2,days:'daily',sch:[['Mumbai Central',null,'17:00',0,0],['Borivali','17:20','17:22',30,0],['Surat','19:43','19:48',263,0],['Vadodara Jn','21:06','21:16',392,0],['Ratlam Jn','00:25','00:28',653,1],['Nagda Jn','01:08','01:10',695,1],['Kota Jn','03:15','03:20',920,1],['New Delhi','08:32',null,1384,1]]},
+'12952':{v:2,days:'daily',sch:[['New Delhi',null,'16:55',0,0],['Kota Jn','21:30','21:40',465,0],['Nagda Jn','23:57','23:59',690,0],['Ratlam Jn','00:30','00:33',731,1],['Vadodara Jn','03:40','03:50',993,1],['Surat','05:13','05:18',1122,1],['Borivali','07:38','07:40',1355,1],['Mumbai Central','08:35',null,1384,1]]},
+'12301':{v:1,days:'Monday to Saturday',sch:[['Howrah Jn',null,'16:50',0,0],['Asansol Jn','18:47','18:49',200,0],['Dhanbad Jn','19:55','20:00',259,0],['Parasnath','20:30','20:32',306,0],['Pt DD Upadhyaya Jn','00:43','00:50',null,1],['New Delhi','10:05',null,1449,1]]}
+};
+T.forEach(t=>{t.days='daily';t.v=0;const o=V[t.no];if(o){Object.assign(t,o);if(o.v==2)t.halts=o.sch.map(x=>x[0])}});
+const POP=[['Mumbai','Delhi'],['Delhi','Mumbai'],['Kolkata','Delhi'],['Delhi','Varanasi'],['Mumbai','Pune'],['Mumbai','Ahmedabad'],['Delhi','Bhopal'],['Delhi','Agra']];
+const mins=s=>{const[a,b]=s.split(':').map(Number);return a*60+b};
+const dur=t=>mins(t.arr)+t.off*1440-mins(t.dep);
+const fd=m=>Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';
+const inr=n=>'₹'+n.toLocaleString('en-IN');
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dlab=(iso,add=0)=>{const d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+add);return DAYS[d.getDay()]+', '+d.getDate()+' '+MON[d.getMonth()]};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1800)}
+function find(q){q=q.trim().toLowerCase();if(!q)return[];return Object.keys(ST).filter(c=>q.includes('('+c.toLowerCase()+')')||c.toLowerCase()==q||ST[c][0].toLowerCase().includes(q)||ST[c][1].toLowerCase().includes(q))}
+let list=[],Q={},sortBy='dep';
+let BK=[];try{BK=JSON.parse(localStorage.getItem('railwise')||'[]')}catch(e){}
+const saveBK=()=>{try{localStorage.setItem('railwise',JSON.stringify(BK))}catch(e){}};
 
-function model(){try{const f=compile(S.f,'f(x)'),g=compile(S.g,'g(x)'),x=compile(S.x||'0','x');
-M={f,g,a:x.fn(0),fg:v=>f.fn(g.fn(v)),gf:v=>g.fn(f.fn(v))};$('ferr').textContent=''}catch(e){M=null;$('ferr').textContent=e.message}return M}
-function block(name,A,B,an,bn,cls){const sym=sub(A.t,B.t),a=M.a,m=B.fn(a),r=A.fn(m);
-const bad=isNaN(m)?`${bn}(${fmt(a)}) is undefined, so ${an}(${bn}(${fmt(a)})) is undefined too.`:isNaN(r)?`${an}(${fmt(m)}) is undefined.`:`So (${an}∘${bn})(${fmt(a)}) = ${fmt(r)}.`;
-return `<div class="panel"><h2>(${an}∘${bn})(x)</h2><div class="big ${cls}">${an}(${bn}(x)) = ${esc(sym)}</div>
-<ol class="steps"><li>Start with ${an}(x) = <code>${esc(A.src)}</code> and ${bn}(x) = <code>${esc(B.src)}</code>.</li>
-<li>Replace each x in ${an} with ${bn}(x). This gives <code>${esc(sym)}</code>.</li>
-<li>Evaluate the inside first: ${bn}(${fmt(a)}) = <strong>${fmt(m)}</strong>.</li>
-<li>Then use that as the input: ${an}(${fmt(m)}) = <strong>${fmt(r)}</strong>. ${bad}</li></ol>
-<p class="note">${holeText(holes(v=>A.fn(B.fn(v))))}</p>
-<div class="tools"><button data-copy="(${an}∘${bn})(x) = ${esc(sym)}">Copy expression</button></div></div>`}
-function renderCalc(){if(!model()){$('calcout').innerHTML='<div class="panel">Fix the highlighted problem above to see results.</div>';return}
-const {f,g,a}=M,fg=M.fg(a),gf=M.gf(a),same=!isNaN(fg)&&!isNaN(gf)&&Math.abs(fg-gf)<1e-9;
-$('calcout').innerHTML=`<div class="cols">${block('fg',f,g,'f','g','')}${block('gf',g,f,'g','f','alt')}</div>
-<div class="panel"><h2>Values at x = ${fmt(a)}</h2><div class="tw"><table><tr><th>f(x)</th><th>g(x)</th><th>f(g(x))</th><th>g(f(x))</th></tr>
-<tr><td>${fmt(f.fn(a))}</td><td>${fmt(g.fn(a))}</td><td>${fmt(fg)}</td><td>${fmt(gf)}</td></tr></table></div>
-<p class="note" style="margin-top:12px">${isNaN(fg)||isNaN(gf)?'At least one composite is undefined at this x.':same?'Both orders give the same value here, though they may differ at other x.':'The two orders give different values, so f∘g and g∘f are not the same function.'}</p>
-<div class="tools"><button class="pri" data-p="graph">View graph</button><button data-p="table">View table</button></div></div>`}
+$('stl').innerHTML=Object.keys(ST).map(c=>`<option value="${ST[c][0]} (${c})">`).join('');
+$('pop').innerHTML='<span class="note" style="border:0;background:none;padding:6px 0;margin:0">Popular:</span>'+POP.map((p,i)=>`<button class="chip" data-p="${i}">${p[0]} to ${p[1]}</button>`).join('');
+const t0=new Date();t0.setDate(t0.getDate()+1);const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+$('dt').min=iso(new Date());$('dt').value=iso(t0);
 
-function theme(n){const c=getComputedStyle(document.documentElement);return c.getPropertyValue(n).trim()}
-function niceStep(s){for(const st of [.1,.2,.5,1,2,5,10,20,50,100,200])if(st*s>=48)return st;return 500}
-function draw(){const c=$('cv');if(c.offsetParent===null)return;const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;
-const x=c.getContext('2d');x.scale(d,d);const W=r.width,H=r.height,s=W/(2*S.range),px=v=>W/2+v*s,py=v=>H/2-v*s;
-x.fillStyle=theme('--panel');x.fillRect(0,0,W,H);const st=niceStep(s);x.font='11px "IBM Plex Mono",monospace';x.lineWidth=1;
-for(let v=Math.ceil(-W/2/s/st)*st;v<=W/2/s;v+=st){const X=px(v);x.strokeStyle=theme('--line');x.beginPath();x.moveTo(X,0);x.lineTo(X,H);x.stroke();if(Math.abs(v)>1e-9){x.fillStyle=theme('--mut');x.fillText(fmt(+v.toFixed(6)),X+3,py(0)+12)}}
-for(let v=Math.ceil(-H/2/s/st)*st;v<=H/2/s;v+=st){const Y=py(v);x.strokeStyle=theme('--line');x.beginPath();x.moveTo(0,Y);x.lineTo(W,Y);x.stroke();if(Math.abs(v)>1e-9){x.fillStyle=theme('--mut');x.fillText(fmt(+v.toFixed(6)),px(0)+4,Y-3)}}
-x.strokeStyle=theme('--ink');x.lineWidth=1.5;x.beginPath();x.moveTo(0,py(0));x.lineTo(W,py(0));x.moveTo(px(0),0);x.lineTo(px(0),H);x.stroke();
-if(!M)return;const defs=[['f',M.f.fn,'--f'],['g',M.g.fn,'--g'],['fg',M.fg,'--fg'],['gf',M.gf,'--gf']];
-x.lineWidth=2.5;x.lineJoin='round';defs.forEach(([k,fn,col])=>{if(!S.show[k])return;x.strokeStyle=theme(col);x.beginPath();let pen=false,py0=0;
-for(let i=0;i<=W;i++){const v=fn((i-W/2)/s),Y=py(v);if(isNaN(v)||Math.abs(Y)>H*3||(pen&&Math.abs(Y-py0)>H*1.2)){pen=false;continue}if(!pen){x.moveTo(i,Y);pen=true}else x.lineTo(i,Y);py0=Y}x.stroke()});
-if(hx!==null){const X=px(hx);x.strokeStyle=theme('--mut');x.setLineDash([4,4]);x.beginPath();x.moveTo(X,0);x.lineTo(X,H);x.stroke();x.setLineDash([]);
-$('readout').textContent='x = '+fmt(+hx.toFixed(3))+'   '+defs.filter(d=>S.show[d[0]]).map(d=>({f:'f',g:'g',fg:'f(g(x))',gf:'g(f(x))'}[d[0]])+' = '+fmt(d[1](hx))).join('   ')}}
-function renderGraph(){model();$('chk').innerHTML=[['f','f(x)','--f'],['g','g(x)','--g'],['fg','f(g(x))','--fg'],['gf','g(f(x))','--gf']].map(([k,n,c])=>`<label><input type="checkbox" data-k="${k}" ${S.show[k]?'checked':''}><span style="color:var(${c});font-weight:700">${n}</span></label>`).join('');draw()}
-function renderTable(){if(!model()){$('tbl').innerHTML='<tr><td>Fix the function error above.</td></tr>';return}
-const a=+compile($('t0').value||'0','From').fn(0),b=+compile($('t1').value||'0','To').fn(0);let st=Math.abs(+compile($('ts').value||'1','Step').fn(0))||1;let rows='';let n=0;csv='x,g(x),f(g(x)),f(x),g(f(x))\n';
-for(let v=a;v<=b+1e-9&&n<80;v+=st,n++){const q=+v.toFixed(10),vals=[q,M.g.fn(q),M.fg(q),M.f.fn(q),M.gf(q)].map(fmt);rows+='<tr>'+vals.map(z=>`<td>${z==='undefined'?'–':z}</td>`).join('')+'</tr>';csv+=vals.join(',')+'\n'}
-$('tbl').innerHTML='<tr><th>x</th><th>g(x)</th><th>f(g(x))</th><th>f(x)</th><th>g(f(x))</th></tr>'+rows}
-let csv='';
-const EX=[['x^2+1','2x-3','2','Polynomial inside a polynomial. Order matters.'],['sqrt(x)','x-4','13','The domain shrinks to x ≥ 4.'],['1/x','x-2','5','Dividing by zero leaves a hole at x = 2.'],['sin(x)','x^2','1','Sine of a square, in radians.'],['ln(x)','exp(x)','3','An inverse pair: the result is x.'],['abs(x)','x^3-x','-2','Absolute value folds the graph upward.'],['2x+3','(x-3)/2','7','Inverses undo each other.'],['x^2','x+1','3','Squaring after shifting vs shifting after squaring.']];
-$('exgrid').innerHTML=EX.map((e,i)=>`<div class="panel"><span class="mono">f(x) = ${esc(e[0])}</span><span class="mono">g(x) = ${esc(e[1])}</span><span class="note">${esc(e[3])}</span><button data-ex="${i}">Load example</button></div>`).join('');
-$('keys').innerHTML=['x','(',')','^','+','-','*','/','sin(','cos(','tan(','sqrt(','ln(','abs(','pi','e','Backspace'].map(k=>`<button data-key="${k}" aria-label="${k=='Backspace'?'Backspace':'Insert '+k}">${k=='Backspace'?'⌫':k}</button>`).join('');
+function search(){const f=find($('fr').value),t=find($('to').value);Q={f:$('fr').value,t:$('to').value,d:$('dt').value||iso(t0),c:$('cl').value};
+if(!f.length||!t.length){list=null}else{list=T.filter(x=>f.includes(x.from)&&t.includes(x.to)&&(!Q.c||x.fare[Q.c]))}
+render()}
+function render(){const el=$('res');
+if(list===null){el.innerHTML='<div class="empty"><b>We could not find that station.</b><br>Try a city like Mumbai, Delhi, Kolkata, Pune or Varanasi, or choose one from the suggestions.</div>';return}
+if(!list.length){el.innerHTML=`<div class="empty"><b>No trains listed for ${esc(Q.f)} to ${esc(Q.t)}${Q.c?' in '+Q.c:''}.</b><br>Railwise lists 12 popular services. Try one of the popular routes above.</div>`;return}
+const L=[...list].sort((a,b)=>sortBy=='dep'?mins(a.dep)-mins(b.dep):sortBy=='dur'?dur(a)-dur(b):Math.min(...Object.values(a.fare))-Math.min(...Object.values(b.fare)));
+el.innerHTML=`<div class="bar"><h2>${L.length} train${L.length>1?'s':''} · ${esc(Q.f)} to ${esc(Q.t)} · ${dlab(Q.d)}</h2><label>Sort by <select id="so"><option value="dep">Earliest departure</option><option value="dur">Shortest journey</option><option value="fare">Lowest fare</option></select></label></div>`+
+L.map(t=>{const i=T.indexOf(t),m=dur(t),ty=t.type=='Rajdhani'?'r':t.type=='Vande Bharat'?'v':'';
+return `<article class="t"><div class="th"><b>${esc(t.name)}</b><span class="no">${t.no}</span><span class="tag ${ty}">${t.type}</span><span class="tag">${t.v==2?'Verified timetable':t.v==1?'Partly verified':'Times unverified'}</span><span class="run">Runs ${t.days}</span></div>
+<div class="tm"><div class="c"><b>${t.dep}</b><span>${esc(ST[t.from][0])}</span></div><div class="ln">${fd(m)}<div></div>${t.km} km · ${t.halts.length-2} halt${t.halts.length-2==1?'':'s'}</div><div class="c e"><b>${t.arr}</b><span>${esc(ST[t.to][0])}${t.off?' · '+dlab(Q.d,t.off):''}</span></div></div>
+<div class="fares">${Object.keys(t.fare).filter(k=>!Q.c||k==Q.c).map(k=>`<button class="fc" data-bk="${i}|${k}"><small>${CL[k]} (${k})</small><b>${inr(t.fare[k])}</b></button>`).join('')}<button class="rt" data-rt="${i}" aria-expanded="false">View route</button></div>
+<div class="route" id="r${i}" hidden><b>Route and halts</b><ol>${(t.sch||t.halts.map(h=>[h])).map(x=>`<li>${esc(x[0])}${x[1]||x[2]?`<em>${x[1]?'arr '+x[1]:''}${x[1]&&x[2]?' · ':''}${x[2]?'dep '+x[2]:''}${x[3]!=null?' · '+x[3]+' km':''}</em>`:''}</li>`).join('')}</ol>${t.v<2?'<p class="no" style="font-size:.84rem">'+(t.v?'Only the stops shown are verified. This train has more halts.':'Halts and times for this train are not verified yet. Check NTES.')+'</p>':''}</div></article>`}).join('')+
+'<div class="note">Fares are indicative per adult and vary with dynamic pricing, quota and catering. Check availability and the latest timetable on IRCTC before you travel.</div>';
+$('so').value=sortBy}
 
-let last='fi';['fi','gi','xi'].forEach(id=>{$(id).addEventListener('focus',()=>last=id);$(id).addEventListener('input',()=>{S[id[0]]=$(id).value;save();refresh()})});
-function sync(){$('fi').value=S.f;$('gi').value=S.g;$('xi').value=S.x}
-function refresh(){const p=cur();if(p=='calc')renderCalc();else if(p=='graph')renderGraph();else if(p=='table')renderTable();else model()}
-const cur=()=>({'':'calc','/':'calc','/graph':'graph','/table':'table','/learn':'learn','/examples':'examples','/help':'help'}[location.hash.slice(1)]||'calc');
-function route(){const p=cur();['calc','graph','table','learn','examples','help'].forEach(k=>$('p-'+k).hidden=k!=p);
-$('fbarwrap').hidden=!['calc','graph','table'].includes(p);document.querySelectorAll('nav a').forEach(a=>a.toggleAttribute('aria-current',a.dataset.p==p)||0);
-document.querySelectorAll('nav a').forEach(a=>{if(a.dataset.p==p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});window.scrollTo(0,0);refresh()}
-addEventListener('hashchange',route);addEventListener('resize',()=>{if(cur()=='graph')draw()});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-if(b.dataset.p){location.hash=b.dataset.p=='calc'?'#/':'#/'+b.dataset.p}
-else if(b.dataset.copy)copy(b.dataset.copy);
-else if(b.dataset.ex){const q=EX[b.dataset.ex];S.f=q[0];S.g=q[1];S.x=q[2];save();sync();location.hash='#/'}
-else if(b.dataset.key){const el=$(last),k=b.dataset.key;el.focus();let s=el.selectionStart,t=el.selectionEnd;
-if(k=='Backspace'){if(s==t&&s>0)s--;el.value=el.value.slice(0,s)+el.value.slice(t);el.setSelectionRange(s,s)}else{el.value=el.value.slice(0,s)+k+el.value.slice(t);el.setSelectionRange(s+k.length,s+k.length)}
-S[last[0]]=el.value;save();refresh()}});
-$('swap').onclick=()=>{[S.f,S.g]=[S.g,S.f];save();sync();refresh();toast('Swapped f and g')};
-$('clear').onclick=()=>{S.f='';S.g='';S.x='0';save();sync();refresh();$('fi').focus()};
-$('theme').onclick=()=>{const d=document.documentElement,dark=(d.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))=='dark';d.dataset.theme=dark?'light':'dark';if(cur()=='graph')draw()};
-$('chk').addEventListener('change',e=>{S.show[e.target.dataset.k]=e.target.checked?1:0;save();draw()});
-$('zi').onclick=()=>{S.range=Math.max(.5,S.range/1.5);draw()};$('zo').onclick=()=>{S.range=Math.min(500,S.range*1.5);draw()};$('zr').onclick=()=>{S.range=8;draw()};
-$('cv').addEventListener('pointermove',e=>{const r=e.target.getBoundingClientRect();hx=((e.clientX-r.left)-r.width/2)/(r.width/(2*S.range));draw()});
-$('cv').addEventListener('pointerleave',()=>{hx=null;draw()});
-['t0','t1','ts'].forEach(id=>$(id).addEventListener('input',()=>{try{renderTable()}catch(e){$('tbl').innerHTML='<tr><td>'+esc(e.message)+'</td></tr>'}}));
-$('tcopy').onclick=()=>copy(csv);
-sync();route();
+if(b.dataset.v){['s','w','b','a'].forEach(k=>{$('v'+k).hidden=k!=b.dataset.v});document.querySelectorAll('nav button').forEach(n=>n.setAttribute('aria-pressed',n.dataset.v==b.dataset.v));if(b.dataset.v=='b')renderBK();if(b.dataset.v=='w')initW();window.scrollTo(0,0)}
+else if(b.dataset.p){const p=POP[b.dataset.p];$('fr').value=p[0];$('to').value=p[1];$('cl').value='';search();$('res').scrollIntoView({behavior:'smooth'})}
+else if(b.dataset.rt!==undefined){const r=$('r'+b.dataset.rt);r.hidden=!r.hidden;b.textContent=r.hidden?'View route':'Hide route';b.setAttribute('aria-expanded',!r.hidden)}
+else if(b.dataset.bk){const[i,k]=b.dataset.bk.split('|');openBook(+i,k)}
+else if(b.dataset.cancel){BK=BK.filter(x=>x.pnr!=b.dataset.cancel);saveBK();renderBK();toast('Booking cancelled')}});
+document.addEventListener('change',e=>{if(e.target.id=='so'){sortBy=e.target.value;render()}});
+$('sf').addEventListener('submit',e=>{e.preventDefault();search()});
+$('sw').onclick=()=>{[$('fr').value,$('to').value]=[$('to').value,$('fr').value];search()};
+$('theme').onclick=()=>{const d=document.documentElement,dark=(d.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))=='dark';d.dataset.theme=dark?'light':'dark'};
+
+function openBook(i,k){const t=T[i],d=$('dlg');
+d.innerHTML=`<form class="dm" id="bf" method="dialog"><h3>Book ${esc(t.name)}</h3><div class="no">${t.no} · ${esc(ST[t.from][0])} to ${esc(ST[t.to][0])} · ${dlab(Q.d)} · ${t.dep}</div>
+<div class="g2"><div class="f"><label for="pn">Passenger name</label><input id="pn" required maxlength="40" autocomplete="off"></div><div class="f"><label for="pa">Age</label><input id="pa" type="number" min="1" max="110" required></div>
+<div class="f"><label for="pg">Gender</label><select id="pg"><option>Female</option><option>Male</option><option>Other</option></select></div><div class="f"><label for="pm">Mobile number</label><input id="pm" inputmode="numeric" pattern="[6-9][0-9]{9}" title="10-digit Indian mobile number" required></div>
+<div class="f"><label for="pc">Passengers</label><select id="pc">${[1,2,3,4,5,6].map(n=>`<option>${n}</option>`).join('')}</select></div><div class="f"><label>Class</label><input value="${CL[k]} (${k})" disabled></div></div>
+<div><b>Total fare: </b><span id="tot">${inr(t.fare[k])}</span></div>
+<p class="no" style="font-size:.84rem;margin:8px 0 0">Demo only. This ticket cannot be used for travel.</p>
+<div class="row"><button type="button" class="sec" id="cx">Cancel</button><button class="go" type="submit">Confirm booking</button></div></form>`;
+d.showModal();$('cx').onclick=()=>d.close();$('pn').focus();
+$('pc').onchange=()=>$('tot').textContent=inr(t.fare[k]*$('pc').value);
+$('bf').onsubmit=e=>{e.preventDefault();const n=+$('pc').value,b={pnr:String(Math.floor(2e9+Math.random()*7e9)),i,k,d:Q.d,name:$('pn').value.trim(),age:$('pa').value,g:$('pg').value,m:$('pm').value,n,total:t.fare[k]*n};
+BK.unshift(b);saveBK();ticket(b)}}
+function ticket(b){const t=T[b.i];$('dlg').innerHTML=`<div class="dm"><h3>Booking confirmed</h3><div class="tk"><div class="no">PNR (demo)</div><div class="pnr">${b.pnr}</div>
+<p style="margin:10px 0 0"><b>${esc(t.name)}</b> (${t.no})<br>${esc(ST[t.from][0])} ${t.dep} to ${esc(ST[t.to][0])} ${t.arr}<br>${dlab(b.d)} · ${CL[b.k]} (${b.k})<br>${esc(b.name)}, ${b.age}, ${b.g}${b.n>1?' + '+(b.n-1)+' more':''}<br><b>Paid: ${inr(b.total)}</b></p></div>
+<p class="no" style="font-size:.84rem">Demo ticket for practice. Not valid for travel.</p>
+<div class="row"><button class="sec" id="cp">Copy details</button><button class="go" id="dn">Done</button></div></div>`;
+$('dn').onclick=()=>$('dlg').close();
+$('cp').onclick=()=>{const s=`PNR ${b.pnr} (demo) | ${t.no} ${t.name} | ${ST[t.from][0]} to ${ST[t.to][0]} | ${dlab(b.d)} ${t.dep} | ${b.k} | ${b.n} passenger(s) | ${inr(b.total)}`;try{navigator.clipboard.writeText(s).then(()=>toast('Copied'),()=>toast('Copy blocked by the browser'))}catch(e){toast('Copy blocked by the browser')}}}
+function renderBK(){$('bl').innerHTML=BK.length?BK.map(b=>{const t=T[b.i];return `<div class="bk"><div><div class="pnr">PNR ${b.pnr}</div><b>${esc(t.name)}</b> <span class="no">${t.no}</span></div><div>${esc(ST[t.from][0])} to ${esc(ST[t.to][0])}<br><span class="no">${dlab(b.d)} · ${t.dep} · ${b.k} · ${b.n} passenger${b.n>1?'s':''}</span></div><div style="margin-left:auto"><b>${inr(b.total)}</b></div><button class="sec" data-cancel="${b.pnr}">Cancel booking</button></div>`}).join(''):'<div class="empty">No bookings yet. Search for a train and pick a class to book.</div>'}
+
+function initW(){const s=$('wt');if(!s.options.length){s.innerHTML=T.map((t,i)=>`<option value="${i}">${t.no} ${esc(t.name)} (${esc(ST[t.from][0])} to ${esc(ST[t.to][0])})</option>`).join('');$('wd').value=iso(new Date())}showW()}
+const hm=d=>String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+function showW(){const t=T[+$('wt').value],[y,m,d]=($('wd').value||iso(new Date())).split('-').map(Number),h=mins(t.dep),st=new Date(y,m-1,d,Math.floor(h/60),h%60),e=Math.round((new Date()-st)/60000),total=dur(t);
+const P=t.sch?t.sch.map(x=>({n:x[0],a:x[1]?x[4]*1440+mins(x[1])-mins(t.dep):null,d:x[2]?x[4]*1440+mins(x[2])-mins(t.dep):null,km:x[3]})).map(p=>({...p,a:p.a??p.d,d:p.d??p.a})):[{n:ST[t.from][0],a:0,d:0,km:0},{n:ST[t.to][0],a:total,d:total,km:t.km}];
+const at=x=>hm(new Date(st.getTime()+x*60000));let msg,km=null,nx=null;
+if(e<0){msg=`Not started yet. It leaves ${P[0].n} at ${t.dep}.`;km=0;nx=P[0]}
+else if(e>total){msg=`Reached ${P[P.length-1].n}.`;km=t.km}
+else{for(let i=0;i<P.length;i++){const p=P[i];if(e>=p.a&&e<=p.d){msg=`At ${p.n} station.`;km=p.km;nx=P[i+1]||null;break}
+if(i<P.length-1&&e>p.d&&e<P[i+1].a){const q=P[i+1],f=(e-p.d)/(q.a-p.d);km=p.km!=null&&q.km!=null?Math.round(p.km+f*(q.km-p.km)):null;msg=`Between ${p.n} and ${q.n}.`;nx=q;break}}}
+const pct=Math.max(0,Math.min(100,e/total*100));
+$('wo').innerHTML=`<div class="t" style="padding:20px"><b>${esc(t.name)}</b> <span class="no">${t.no}</span><div class="pb" role="progressbar" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+<p style="margin:0 0 6px"><b>${msg}</b></p>${km!=null?`<p class="no" style="margin:0">About ${km} of ${t.km} km covered on the timetable.</p>`:''}${nx&&e>=0&&e<=total?`<p class="no" style="margin:0">Next stop: ${esc(nx.n)}, scheduled ${at(nx.a)}.</p>`:''}
+<p class="no" style="font-size:.84rem;margin:10px 0 0">Timetable estimate only. A delayed train will be further behind.${t.v<2?' This train\u2019s timetable is not fully verified.':''}</p>
+<a class="lk" href="https://enquiry.indianrail.gov.in/mntes/" target="_blank" rel="noopener">Live status on NTES</a><a class="lk" href="https://www.ixigo.com/trains/${t.no}" target="_blank" rel="noopener">${t.no} on ixigo</a></div>`}
+$('wg').onclick=showW;
+search();
 </script>
 </body>
 </html>
