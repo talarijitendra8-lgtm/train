@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Composer: Function Composition Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#EEF2F6;--panel:#fff;--ink:#101B33;--mut:#566175;--line:#D3DBE5;--f:#2B50E6;--g:#C2185B;--fg:#0F8B6D;--gf:#A86A0C;--acc:#2B50E6;--on:#fff;--grid:rgba(43,80,230,.07)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1424;--panel:#151E33;--ink:#E8EDF7;--mut:#9AA5BA;--line:#28344F;--f:#7C99FF;--g:#FF7AA8;--fg:#3FD1A8;--gf:#F0B84A;--acc:#7C99FF;--on:#0D1424;--grid:rgba(124,153,255,.08)}}
+:root[data-theme="dark"]{--bg:#0D1424;--panel:#151E33;--ink:#E8EDF7;--mut:#9AA5BA;--line:#28344F;--f:#7C99FF;--g:#FF7AA8;--fg:#3FD1A8;--gf:#F0B84A;--acc:#7C99FF;--on:#0D1424;--grid:rgba(124,153,255,.08)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;
+background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;line-height:1.15;margin:0 0 .5em}
+h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.5rem;font-weight:600}h3{font-size:1.1rem;font-weight:600}
+p{margin:0 0 1em;max-width:68ch}
+a{color:var(--acc)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+header{background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.bar{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:20px}
+.logo{font:800 1.35rem "Bricolage Grotesque",sans-serif;color:var(--ink);text-decoration:none;white-space:nowrap}
+.logo span{color:var(--acc)}
+nav{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav a{padding:8px 12px;border-radius:8px;color:var(--mut);text-decoration:none;font-weight:500;white-space:nowrap}
+nav a:hover{background:var(--bg);color:var(--ink)}
+nav a[aria-current="page"]{background:var(--ink);color:var(--bg)}
+main{max-width:1080px;margin:0 auto;padding:32px 20px 64px}
+.lead{color:var(--mut);font-size:1.1rem}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px}
+.fbar{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:end}
+.fbar .row2{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+label{display:block;font-weight:600;font-size:.9rem;color:var(--mut)}
+input{width:100%;margin-top:4px;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:500 1.05rem "IBM Plex Mono",monospace}
+input:focus{border-color:var(--acc)}
+#fi{border-left:5px solid var(--f)}#gi{border-left:5px solid var(--g)}
+button{font:600 .95rem "IBM Plex Sans",sans-serif;padding:10px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--acc)}button:active{transform:translateY(1px)}
+button.pri{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.keys{display:flex;flex-wrap:wrap;gap:6px;grid-column:1/-1}
+.keys button{padding:6px 11px;font:500 .9rem "IBM Plex Mono",monospace}
+.err{grid-column:1/-1;color:var(--g);font-weight:500;min-height:1.4em}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.big{font:500 1.15rem/1.5 "IBM Plex Mono",monospace;overflow-x:auto;padding:12px;background:var(--bg);border-radius:8px;border-left:5px solid var(--fg)}
+.big.alt{border-left-color:var(--gf)}
+ol.steps{padding-left:1.2em;margin:0}ol.steps li{margin-bottom:.7em}
+code,.mono{font-family:"IBM Plex Mono",monospace;font-size:.95em}
+.note{color:var(--mut);font-size:.92rem}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:.8rem;font-weight:600;background:var(--bg);border:1px solid var(--line)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chk{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px}
+.chk label{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
+.chk input{width:auto;margin:0}
+canvas{width:100%;height:clamp(300px,55vw,520px);display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;touch-action:none}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font:.95rem "IBM Plex Mono",monospace}
+th,td{padding:8px 14px;text-align:right;border-bottom:1px solid var(--line)}
+th{background:var(--bg);font-family:"IBM Plex Sans",sans-serif}
+.ex{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.ex .panel{margin:0;display:flex;flex-direction:column;gap:6px}.ex .mono{display:block}.ex button{margin-top:auto;align-self:flex-start}
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:600}
+.tbl2 td,.tbl2 th{text-align:left}
+footer{max-width:1080px;margin:0 auto;padding:0 20px 40px;color:var(--mut);font-size:.9rem}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+[hidden]{display:none!important}
+@media (max-width:760px){.fbar,.cols{grid-template-columns:1fr}.bar{flex-wrap:wrap;gap:8px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+<a class="logo" href="#/">f<span>∘</span>g Composer</a>
+<nav aria-label="Main">
+<a href="#/" data-p="calc">Calculator</a><a href="#/graph" data-p="graph">Graph</a><a href="#/table" data-p="table">Table</a><a href="#/learn" data-p="learn">Learn</a><a href="#/examples" data-p="examples">Examples</a><a href="#/help" data-p="help">Help</a>
+</nav>
+<button id="theme" aria-label="Switch light or dark theme">Theme</button>
+</div></header>
+<main>
+<section id="fbarwrap" class="panel">
+<div class="fbar">
+<label>f(x) =<input id="fi" spellcheck="false" autocomplete="off" aria-label="f of x"></label>
+<button id="swap" title="Swap f and g">Swap f and g</button>
+<label>g(x) =<input id="gi" spellcheck="false" autocomplete="off" aria-label="g of x"></label>
+<div class="row2"><label style="width:150px">Evaluate at x =<input id="xi" spellcheck="false" autocomplete="off"></label>
+<button id="clear">Clear all</button></div>
+<div class="keys" id="keys" aria-label="Insert symbols"></div>
+<div class="err" id="ferr" role="alert"></div>
+</div>
+</section>
+
+<section id="p-calc">
+<h1>Compose two functions and see every step.</h1>
+<p class="lead">Type f(x) and g(x) above. Composer builds f(g(x)) and g(f(x)), evaluates both, and checks where each is defined.</p>
+<div id="calcout"></div>
+</section>
+
+<section id="p-graph" hidden>
+<h1>Graph</h1>
+<div class="chk" id="chk"></div>
+<canvas id="cv" aria-label="Graph of the functions"></canvas>
+<p class="note" id="readout">Move over the graph to read values.</p>
+<div class="tools"><button id="zi">Zoom in</button><button id="zo">Zoom out</button><button id="zr">Reset view</button></div>
+</section>
+
+<section id="p-table" hidden>
+<h1>Table of values</h1>
+<div class="panel"><div class="row2" style="display:flex;gap:12px;flex-wrap:wrap">
+<label style="width:110px">From<input id="t0" value="-5"></label><label style="width:110px">To<input id="t1" value="5"></label><label style="width:110px">Step<input id="ts" value="1"></label>
+<button class="pri" id="tcopy" style="align-self:end">Copy as CSV</button></div></div>
+<div class="tw"><table id="tbl"></table></div>
+</section>
+
+<section id="p-learn" hidden>
+<h1>How function composition works</h1>
+<p class="lead">Composition feeds the output of one function into another. Written (f∘g)(x) = f(g(x)), it means: apply g first, then f.</p>
+<h2>A worked example</h2>
+<p>Let f(x) = x² + 1 and g(x) = 2x − 3. To find f(g(x)), replace every x in f with g(x): (2x − 3)² + 1. To find g(f(x)), do the reverse: 2(x² + 1) − 3 = 2x² − 1. The two answers differ, so order matters.</p>
+<h2>Domain</h2>
+<p>f(g(x)) exists only when g(x) is defined and its output is allowed by f. If f(x) = √x and g(x) = x − 4, then f(g(x)) needs x − 4 ≥ 0, so x ≥ 4. The graph page shows gaps where a composite is undefined.</p>
+<h2>Inverse functions</h2>
+<p>If f and g undo each other, both f(g(x)) and g(f(x)) simplify to x. Try f(x) = 2x + 3 with g(x) = (x − 3)/2 on the Examples page.</p>
+<h2>Decomposing a function</h2>
+<p>To split h(x) = (3x + 1)⁴ into two functions, name the inside g(x) = 3x + 1 and the outside f(x) = x⁴. Then h = f∘g. This is the first step of the chain rule in calculus.</p>
+<p><a href="#/examples">Try an example</a></p>
+</section>
+
+<section id="p-examples" hidden>
+<h1>Examples</h1>
+<p class="lead">Pick one to load it into the calculator.</p>
+<div class="ex" id="exgrid"></div>
+</section>
+
+<section id="p-help" hidden>
+<h1>Help</h1>
+<h2>Syntax</h2>
+<div class="tw" style="margin-bottom:24px"><table class="tbl2"><tr><th>To write</th><th>Type</th></tr>
+<tr><td>Powers</td><td class="mono">x^2, 2^x</td></tr><tr><td>Multiply</td><td class="mono">2*x or 2x or 3(x+1)</td></tr>
+<tr><td>Roots and absolute value</td><td class="mono">sqrt(x), cbrt(x), abs(x)</td></tr>
+<tr><td>Trig (radians)</td><td class="mono">sin(x), cos(x), tan(x), asin, acos, atan</td></tr>
+<tr><td>Logs and exponentials</td><td class="mono">ln(x), log(x) for base 10, exp(x)</td></tr>
+<tr><td>Constants</td><td class="mono">pi, e</td></tr></table></div>
+<h2>Questions</h2>
+<details><summary>Why does the result say undefined?</summary><p>The input broke a rule of a function, such as dividing by zero, taking the square root of a negative number, or taking the log of zero or less.</p></details>
+<details><summary>Does Composer simplify the result?</summary><p>No. It shows the substituted form exactly, so you can see each step. The table and graph confirm the values numerically.</p></details>
+<details><summary>Are my functions saved?</summary><p>Yes, in this browser only, so they are still here when you return.</p></details>
+<details><summary>Can I use degrees?</summary><p>Trig functions use radians. For degrees, write sin(x*pi/180).</p></details>
+</section>
+</main>
+<footer>Composer runs entirely in your browser. Nothing you type is sent anywhere.</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const $=id=>document.getElementById(id);
+const FN={sin:Math.sin,cos:Math.cos,tan:Math.tan,asin:Math.asin,acos:Math.acos,atan:Math.atan,sinh:Math.sinh,cosh:Math.cosh,tanh:Math.tanh,sqrt:Math.sqrt,cbrt:Math.cbrt,abs:Math.abs,ln:Math.log,log:Math.log10,exp:Math.exp,floor:Math.floor,ceil:Math.ceil,round:Math.round,sign:Math.sign};
+const CO={pi:Math.PI,e:Math.E};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>(typeof n!=='number'||isNaN(n))?'undefined':String(+n.toPrecision(10));
+function lex(s){const t=[];let i=0;s=s.replace(/π/g,'pi').replace(/[×·]/g,'*').replace(/−/g,'-');
+while(i<s.length){const ch=s[i];if(/\s/.test(ch)){i++;continue}let m,r=s.slice(i);
+if(m=/^(\d+\.?\d*|\.\d+)/.exec(r)){t.push({k:'n',v:m[0]});i+=m[0].length}
+else if(m=/^[a-z]+/i.exec(r)){t.push({k:'i',v:m[0].toLowerCase()});i+=m[0].length}
+else if('+-*/^'.includes(ch)){t.push({k:'o',v:ch});i++}
+else if(ch=='('||ch==')'){t.push({k:ch,v:ch});i++}
+else throw Error('Unexpected character "'+ch+'"')}return t}
+function parse(t){let p=0;const pk=()=>t[p],nx=()=>t[p++];
+function E(){let l=T();while(pk()&&pk().k=='o'&&'+-'.includes(pk().v)){const o=nx().v;l={o,l,r:T()}}return l}
+function T(){let l=U();for(;;){const k=pk();if(!k)break;if(k.k=='o'&&'*/'.includes(k.v)){nx();l={o:k.v,l,r:U()}}else if(k.k=='n'||k.k=='i'||k.k=='('){l={o:'*',l,r:U()}}else break}return l}
+function U(){const k=pk();if(k&&k.k=='o'&&(k.v=='-'||k.v=='+')){nx();const a=U();return k.v=='-'?{o:'neg',l:a}:a}return P()}
+function P(){const b=A();if(pk()&&pk().k=='o'&&pk().v=='^'){nx();return{o:'^',l:b,r:U()}}return b}
+function close(){if(!pk()||pk().k!=')')throw Error('Missing closing parenthesis');nx()}
+function A(){const k=nx();if(!k)throw Error('The expression ends too early');
+if(k.k=='n')return{n:+k.v};
+if(k.k=='('){const e=E();close();return e}
+if(k.k=='i'){if(k.v=='x')return{x:1};if(k.v in CO)return{n:CO[k.v]};
+if(k.v in FN){if(!pk()||pk().k!='(')throw Error(k.v+' needs parentheses, like '+k.v+'(x)');nx();const e=E();close();return{f:FN[k.v],a:e}}
+throw Error('Unknown name "'+k.v+'"')}
+throw Error('Unexpected "'+k.v+'"')}
+const r=E();if(p<t.length)throw Error('Unexpected "'+t[p].v+'"');return r}
+function ev(a,x){if(a.n!==undefined)return a.n;if(a.x)return x;if(a.f)return a.f(ev(a.a,x));const l=ev(a.l,x);if(a.o=='neg')return -l;const r=ev(a.r,x);
+switch(a.o){case'+':return l+r;case'-':return l-r;case'*':return l*r;case'/':return l/r;case'^':return Math.pow(l,r)}}
+function compile(src,name){try{src=(src||'').trim();if(!src)throw Error('Enter a function');const t=lex(src),ast=parse(t);
+return{src,t,fn:x=>{const v=ev(ast,x);return isFinite(v)?v:NaN}}}catch(e){throw Error(name+': '+e.message)}}
+function join(t){let s='';t.forEach((k,i)=>{const pv=t[i-1];if(k.k=='o'){const bin=pv&&['n','i',')','r'].includes(pv.k);s+=(bin&&k.v!='^')?' '+k.v+' ':k.v}else s+=k.v});return s}
+function sub(ft,gt){const gs=join(gt);return join(ft.map((k,i)=>{if(k.k=='i'&&k.v=='x'){const wrapped=ft[i-1]&&ft[i-1].k=='('&&ft[i+1]&&ft[i+1].k==')';return{k:'r',v:(gt.length==1||wrapped)?gs:'('+gs+')'}}return k}))}
+function holes(fn){const out=[];let s=null;const a=-50,b=50,n=4000;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,bad=isNaN(fn(x));if(bad&&s===null)s=x;if(!bad&&s!==null){out.push([s,x-(b-a)/n]);s=null}}if(s!==null)out.push([s,b]);return out}
+function holeText(h){if(!h.length)return 'No undefined values found for x between -50 and 50.';
+return 'Undefined near '+h.slice(0,3).map(r=>Math.abs(r[1]-r[0])<.05?'x ≈ '+fmt(+r[0].toFixed(2)):'x from '+fmt(+r[0].toFixed(2))+' to '+fmt(+r[1].toFixed(2))).join(', ')+(h.length>3?' and more':'')+'.'}
+
+let S={f:'x^2+1',g:'2x-3',x:'2',range:8,show:{f:1,g:1,fg:1,gf:0}},M=null,hx=null;
+try{Object.assign(S,JSON.parse(localStorage.getItem('composer')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('composer',JSON.stringify(S))}catch(e){}};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1600)}
+function copy(txt){try{navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy blocked by the browser'))}catch(e){toast('Copy blocked by the browser')}}
+
+function model(){try{const f=compile(S.f,'f(x)'),g=compile(S.g,'g(x)'),x=compile(S.x||'0','x');
+M={f,g,a:x.fn(0),fg:v=>f.fn(g.fn(v)),gf:v=>g.fn(f.fn(v))};$('ferr').textContent=''}catch(e){M=null;$('ferr').textContent=e.message}return M}
+function block(name,A,B,an,bn,cls){const sym=sub(A.t,B.t),a=M.a,m=B.fn(a),r=A.fn(m);
+const bad=isNaN(m)?`${bn}(${fmt(a)}) is undefined, so ${an}(${bn}(${fmt(a)})) is undefined too.`:isNaN(r)?`${an}(${fmt(m)}) is undefined.`:`So (${an}∘${bn})(${fmt(a)}) = ${fmt(r)}.`;
+return `<div class="panel"><h2>(${an}∘${bn})(x)</h2><div class="big ${cls}">${an}(${bn}(x)) = ${esc(sym)}</div>
+<ol class="steps"><li>Start with ${an}(x) = <code>${esc(A.src)}</code> and ${bn}(x) = <code>${esc(B.src)}</code>.</li>
+<li>Replace each x in ${an} with ${bn}(x). This gives <code>${esc(sym)}</code>.</li>
+<li>Evaluate the inside first: ${bn}(${fmt(a)}) = <strong>${fmt(m)}</strong>.</li>
+<li>Then use that as the input: ${an}(${fmt(m)}) = <strong>${fmt(r)}</strong>. ${bad}</li></ol>
+<p class="note">${holeText(holes(v=>A.fn(B.fn(v))))}</p>
+<div class="tools"><button data-copy="(${an}∘${bn})(x) = ${esc(sym)}">Copy expression</button></div></div>`}
+function renderCalc(){if(!model()){$('calcout').innerHTML='<div class="panel">Fix the highlighted problem above to see results.</div>';return}
+const {f,g,a}=M,fg=M.fg(a),gf=M.gf(a),same=!isNaN(fg)&&!isNaN(gf)&&Math.abs(fg-gf)<1e-9;
+$('calcout').innerHTML=`<div class="cols">${block('fg',f,g,'f','g','')}${block('gf',g,f,'g','f','alt')}</div>
+<div class="panel"><h2>Values at x = ${fmt(a)}</h2><div class="tw"><table><tr><th>f(x)</th><th>g(x)</th><th>f(g(x))</th><th>g(f(x))</th></tr>
+<tr><td>${fmt(f.fn(a))}</td><td>${fmt(g.fn(a))}</td><td>${fmt(fg)}</td><td>${fmt(gf)}</td></tr></table></div>
+<p class="note" style="margin-top:12px">${isNaN(fg)||isNaN(gf)?'At least one composite is undefined at this x.':same?'Both orders give the same value here, though they may differ at other x.':'The two orders give different values, so f∘g and g∘f are not the same function.'}</p>
+<div class="tools"><button class="pri" data-p="graph">View graph</button><button data-p="table">View table</button></div></div>`}
+
+function theme(n){const c=getComputedStyle(document.documentElement);return c.getPropertyValue(n).trim()}
+function niceStep(s){for(const st of [.1,.2,.5,1,2,5,10,20,50,100,200])if(st*s>=48)return st;return 500}
+function draw(){const c=$('cv');if(c.offsetParent===null)return;const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;
+const x=c.getContext('2d');x.scale(d,d);const W=r.width,H=r.height,s=W/(2*S.range),px=v=>W/2+v*s,py=v=>H/2-v*s;
+x.fillStyle=theme('--panel');x.fillRect(0,0,W,H);const st=niceStep(s);x.font='11px "IBM Plex Mono",monospace';x.lineWidth=1;
+for(let v=Math.ceil(-W/2/s/st)*st;v<=W/2/s;v+=st){const X=px(v);x.strokeStyle=theme('--line');x.beginPath();x.moveTo(X,0);x.lineTo(X,H);x.stroke();if(Math.abs(v)>1e-9){x.fillStyle=theme('--mut');x.fillText(fmt(+v.toFixed(6)),X+3,py(0)+12)}}
+for(let v=Math.ceil(-H/2/s/st)*st;v<=H/2/s;v+=st){const Y=py(v);x.strokeStyle=theme('--line');x.beginPath();x.moveTo(0,Y);x.lineTo(W,Y);x.stroke();if(Math.abs(v)>1e-9){x.fillStyle=theme('--mut');x.fillText(fmt(+v.toFixed(6)),px(0)+4,Y-3)}}
+x.strokeStyle=theme('--ink');x.lineWidth=1.5;x.beginPath();x.moveTo(0,py(0));x.lineTo(W,py(0));x.moveTo(px(0),0);x.lineTo(px(0),H);x.stroke();
+if(!M)return;const defs=[['f',M.f.fn,'--f'],['g',M.g.fn,'--g'],['fg',M.fg,'--fg'],['gf',M.gf,'--gf']];
+x.lineWidth=2.5;x.lineJoin='round';defs.forEach(([k,fn,col])=>{if(!S.show[k])return;x.strokeStyle=theme(col);x.beginPath();let pen=false,py0=0;
+for(let i=0;i<=W;i++){const v=fn((i-W/2)/s),Y=py(v);if(isNaN(v)||Math.abs(Y)>H*3||(pen&&Math.abs(Y-py0)>H*1.2)){pen=false;continue}if(!pen){x.moveTo(i,Y);pen=true}else x.lineTo(i,Y);py0=Y}x.stroke()});
+if(hx!==null){const X=px(hx);x.strokeStyle=theme('--mut');x.setLineDash([4,4]);x.beginPath();x.moveTo(X,0);x.lineTo(X,H);x.stroke();x.setLineDash([]);
+$('readout').textContent='x = '+fmt(+hx.toFixed(3))+'   '+defs.filter(d=>S.show[d[0]]).map(d=>({f:'f',g:'g',fg:'f(g(x))',gf:'g(f(x))'}[d[0]])+' = '+fmt(d[1](hx))).join('   ')}}
+function renderGraph(){model();$('chk').innerHTML=[['f','f(x)','--f'],['g','g(x)','--g'],['fg','f(g(x))','--fg'],['gf','g(f(x))','--gf']].map(([k,n,c])=>`<label><input type="checkbox" data-k="${k}" ${S.show[k]?'checked':''}><span style="color:var(${c});font-weight:700">${n}</span></label>`).join('');draw()}
+function renderTable(){if(!model()){$('tbl').innerHTML='<tr><td>Fix the function error above.</td></tr>';return}
+const a=+compile($('t0').value||'0','From').fn(0),b=+compile($('t1').value||'0','To').fn(0);let st=Math.abs(+compile($('ts').value||'1','Step').fn(0))||1;let rows='';let n=0;csv='x,g(x),f(g(x)),f(x),g(f(x))\n';
+for(let v=a;v<=b+1e-9&&n<80;v+=st,n++){const q=+v.toFixed(10),vals=[q,M.g.fn(q),M.fg(q),M.f.fn(q),M.gf(q)].map(fmt);rows+='<tr>'+vals.map(z=>`<td>${z==='undefined'?'–':z}</td>`).join('')+'</tr>';csv+=vals.join(',')+'\n'}
+$('tbl').innerHTML='<tr><th>x</th><th>g(x)</th><th>f(g(x))</th><th>f(x)</th><th>g(f(x))</th></tr>'+rows}
+let csv='';
+const EX=[['x^2+1','2x-3','2','Polynomial inside a polynomial. Order matters.'],['sqrt(x)','x-4','13','The domain shrinks to x ≥ 4.'],['1/x','x-2','5','Dividing by zero leaves a hole at x = 2.'],['sin(x)','x^2','1','Sine of a square, in radians.'],['ln(x)','exp(x)','3','An inverse pair: the result is x.'],['abs(x)','x^3-x','-2','Absolute value folds the graph upward.'],['2x+3','(x-3)/2','7','Inverses undo each other.'],['x^2','x+1','3','Squaring after shifting vs shifting after squaring.']];
+$('exgrid').innerHTML=EX.map((e,i)=>`<div class="panel"><span class="mono">f(x) = ${esc(e[0])}</span><span class="mono">g(x) = ${esc(e[1])}</span><span class="note">${esc(e[3])}</span><button data-ex="${i}">Load example</button></div>`).join('');
+$('keys').innerHTML=['x','(',')','^','+','-','*','/','sin(','cos(','tan(','sqrt(','ln(','abs(','pi','e','Backspace'].map(k=>`<button data-key="${k}" aria-label="${k=='Backspace'?'Backspace':'Insert '+k}">${k=='Backspace'?'⌫':k}</button>`).join('');
+
+let last='fi';['fi','gi','xi'].forEach(id=>{$(id).addEventListener('focus',()=>last=id);$(id).addEventListener('input',()=>{S[id[0]]=$(id).value;save();refresh()})});
+function sync(){$('fi').value=S.f;$('gi').value=S.g;$('xi').value=S.x}
+function refresh(){const p=cur();if(p=='calc')renderCalc();else if(p=='graph')renderGraph();else if(p=='table')renderTable();else model()}
+const cur=()=>({'':'calc','/':'calc','/graph':'graph','/table':'table','/learn':'learn','/examples':'examples','/help':'help'}[location.hash.slice(1)]||'calc');
+function route(){const p=cur();['calc','graph','table','learn','examples','help'].forEach(k=>$('p-'+k).hidden=k!=p);
+$('fbarwrap').hidden=!['calc','graph','table'].includes(p);document.querySelectorAll('nav a').forEach(a=>a.toggleAttribute('aria-current',a.dataset.p==p)||0);
+document.querySelectorAll('nav a').forEach(a=>{if(a.dataset.p==p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});window.scrollTo(0,0);refresh()}
+addEventListener('hashchange',route);addEventListener('resize',()=>{if(cur()=='graph')draw()});
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+if(b.dataset.p){location.hash=b.dataset.p=='calc'?'#/':'#/'+b.dataset.p}
+else if(b.dataset.copy)copy(b.dataset.copy);
+else if(b.dataset.ex){const q=EX[b.dataset.ex];S.f=q[0];S.g=q[1];S.x=q[2];save();sync();location.hash='#/'}
+else if(b.dataset.key){const el=$(last),k=b.dataset.key;el.focus();let s=el.selectionStart,t=el.selectionEnd;
+if(k=='Backspace'){if(s==t&&s>0)s--;el.value=el.value.slice(0,s)+el.value.slice(t);el.setSelectionRange(s,s)}else{el.value=el.value.slice(0,s)+k+el.value.slice(t);el.setSelectionRange(s+k.length,s+k.length)}
+S[last[0]]=el.value;save();refresh()}});
+$('swap').onclick=()=>{[S.f,S.g]=[S.g,S.f];save();sync();refresh();toast('Swapped f and g')};
+$('clear').onclick=()=>{S.f='';S.g='';S.x='0';save();sync();refresh();$('fi').focus()};
+$('theme').onclick=()=>{const d=document.documentElement,dark=(d.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))=='dark';d.dataset.theme=dark?'light':'dark';if(cur()=='graph')draw()};
+$('chk').addEventListener('change',e=>{S.show[e.target.dataset.k]=e.target.checked?1:0;save();draw()});
+$('zi').onclick=()=>{S.range=Math.max(.5,S.range/1.5);draw()};$('zo').onclick=()=>{S.range=Math.min(500,S.range*1.5);draw()};$('zr').onclick=()=>{S.range=8;draw()};
+$('cv').addEventListener('pointermove',e=>{const r=e.target.getBoundingClientRect();hx=((e.clientX-r.left)-r.width/2)/(r.width/(2*S.range));draw()});
+$('cv').addEventListener('pointerleave',()=>{hx=null;draw()});
+['t0','t1','ts'].forEach(id=>$(id).addEventListener('input',()=>{try{renderTable()}catch(e){$('tbl').innerHTML='<tr><td>'+esc(e.message)+'</td></tr>'}}));
+$('tcopy').onclick=()=>copy(csv);
+sync();route();
+</script>
+</body>
+</html>
